@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced Interest Calculator</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background-color: #f0f2f5; display: flex; justify-content: center; padding: 20px; }
+        .card { background: white; padding: 30px; border-radius: 15px; box-shadow: 0 8px 20px rgba(0,0,0,0.1); width: 100%; max-width: 480px; }
+        h2 { color: #1a73e8; text-align: center; margin-top: 0; }
+        .input-group { margin-bottom: 15px; }
+        label { display: block; font-size: 13px; font-weight: 600; color: #555; margin-bottom: 5px; }
+        input, select { width: 100%; padding: 12px; border: 1px solid #ced4da; border-radius: 8px; box-sizing: border-box; font-size: 15px; }
+        button { width: 100%; padding: 14px; background-color: #1a73e8; color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 15px; transition: background 0.3s; }
+        button:hover { background-color: #1557b0; }
+        #results { margin-top: 25px; padding: 20px; border-radius: 10px; background-color: #f8f9fa; display: none; border-left: 5px solid #1a73e8; }
+        .result-line { display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 16px; }
+        .highlight { font-weight: bold; color: #1a73e8; }
+        hr { border: 0; border-top: 1px solid #dee2e6; margin: 15px 0; }
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <h2>Interest Calculator</h2>
+    
+    <div class="input-group">
+        <label>Principal Amount (₹)</label>
+        <input type="number" id="principal" value="620000">
+    </div>
+
+    <div style="display: flex; gap: 10px;">
+        <div class="input-group" style="flex: 1;">
+            <label>Start Date</label>
+            <input type="date" id="startDate" value="2025-03-27">
+        </div>
+        <div class="input-group" style="flex: 1;">
+            <label>Closing Date</label>
+            <input type="date" id="endDate" value="2026-03-25">
+        </div>
+    </div>
+
+    <div class="input-group">
+        <label>Annual Interest Rate (%)</label>
+        <input type="number" step="0.01" id="rate" value="9.1">
+    </div>
+
+    <div class="input-group">
+        <label>Compounding Frequency</label>
+        <select id="frequency">
+            <option value="365" selected>Daily</option>
+            <option value="52">Weekly</option>
+            <option value="12">Monthly</option>
+            <option value="4">Quarterly</option>
+            <option value="2">Half-Yearly</option>
+            <option value="1">Annually</option>
+        </select>
+    </div>
+
+    <button onclick="calculate()">Calculate Interest</button>
+
+    <div id="results">
+        <div class="result-line">Duration: <span id="resDays" class="highlight">0</span> days</div>
+        <div class="result-line">Frequency: <span id="resFreq" class="highlight">-</span></div>
+        <div class="result-line">Interest: <span id="resInterest" class="highlight">0</span></div>
+        <hr>
+        <div class="result-line" style="font-size: 18px;">Total Amount: <span id="resTotal" class="highlight">0</span></div>
+    </div>
+</div>
+
+<script>
+    function calculate() {
+        const P = parseFloat(document.getElementById('principal').value);
+        const start = new Date(document.getElementById('startDate').value);
+        const end = new Date(document.getElementById('endDate').value);
+        const annualRate = parseFloat(document.getElementById('rate').value) / 100;
+        const n = parseInt(document.getElementById('frequency').value);
+        const freqText = document.getElementById('frequency').options[document.getElementById('frequency').selectedIndex].text;
+
+        if (isNaN(P) || isNaN(annualRate) || end <= start) {
+            alert("Please check your inputs. Ensure the closing date is after the start date.");
+            return;
+        }
+
+        // Exact day count
+        const diffDays = Math.ceil(Math.abs(end - start) / (1000 * 60 * 60 * 24));
+        const t = diffDays / 365; // Time in years
+
+        // General Compound Interest Formula: A = P * (1 + r/n)^(n*t)
+        const amount = P * Math.pow((1 + annualRate / n), (n * t));
+        const interest = amount - P;
+
+        // UI Updates
+        document.getElementById('results').style.display = 'block';
+        document.getElementById('resDays').innerText = diffDays;
+        document.getElementById('resFreq').innerText = freqText;
+        document.getElementById('resInterest').innerText = "₹" + interest.toLocaleString('en-IN', {minimumFractionDigits: 2});
+        document.getElementById('resTotal').innerText = "₹" + amount.toLocaleString('en-IN', {minimumFractionDigits: 2});
+    }
+</script>
+
+</body>
+</html>
